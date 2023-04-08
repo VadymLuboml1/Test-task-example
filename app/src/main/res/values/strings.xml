@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">isTestTask</string>
+
+    <string name="internet_error">Sorry you have no internet</string>
+
 </resources>

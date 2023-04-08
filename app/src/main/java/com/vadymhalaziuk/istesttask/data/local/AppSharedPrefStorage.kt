@@ -5,9 +5,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.vadymhalaziuk.istesttask.data.local.AppSharedPrefStorage.Companion.Keys.LIST
 import com.vadymhalaziuk.istesttask.data.local.model.CooledDownActionLocalDto
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class AppSharedPrefStorage(
-    context: Context,
+class AppSharedPrefStorage @Inject constructor(
+    @ApplicationContext context: Context,
     private val gson: Gson
 ) {
 

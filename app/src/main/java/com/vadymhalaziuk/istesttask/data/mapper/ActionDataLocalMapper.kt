@@ -3,8 +3,9 @@ package com.vadymhalaziuk.istesttask.data.mapper
 import com.vadymhalaziuk.istesttask.data.local.model.CooledDownActionLocalDto
 import com.vadymhalaziuk.istesttask.domain.model.ActionCooledDownDomainModel
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainType
+import javax.inject.Inject
 
-class ActionDataLocalMapper {
+class ActionDataLocalMapper @Inject constructor() {
 
     fun toDomain(localDtos: List<CooledDownActionLocalDto>): List<ActionCooledDownDomainModel> =
         localDtos.mapNotNull {

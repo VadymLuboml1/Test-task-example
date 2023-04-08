@@ -4,8 +4,9 @@ import android.util.Log
 import com.vadymhalaziuk.istesttask.data.mapper.ActionsDataMapper
 import com.vadymhalaziuk.istesttask.data.remote.ActionsRestApi
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel
+import javax.inject.Inject
 
-class RemoteActionsRepository(
+class RemoteActionsRepository @Inject constructor(
     private val api: ActionsRestApi,
     private val mapper: ActionsDataMapper,
 ) {

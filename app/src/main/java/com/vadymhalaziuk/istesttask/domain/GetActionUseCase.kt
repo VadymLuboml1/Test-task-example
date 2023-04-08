@@ -3,9 +3,10 @@ package com.vadymhalaziuk.istesttask.domain
 import android.util.Log
 import com.vadymhalaziuk.istesttask.data.RemoteActionsRepository
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel
+import javax.inject.Inject
 import kotlin.random.Random
 
-class GetActionUseCase(
+class GetActionUseCase @Inject constructor(
     private val sortActionsUseCase: SortActionsUseCase,
     private val remoteActionsRepository: RemoteActionsRepository,
     private val filterActionAccordingToLocal: FilterActionAccordingToLocalUseCase,
@@ -29,7 +30,7 @@ class GetActionUseCase(
                 list.checkIfTopAreWithEqualentPrioprity() -> list[oneOrTwoRandom()]
                 else -> list.first()
             }
-        }//TODO
+        }
 
     private fun List<ActionDomainModel>.checkIfTopAreWithEqualentPrioprity(): Boolean {
         if (size < 2) return false

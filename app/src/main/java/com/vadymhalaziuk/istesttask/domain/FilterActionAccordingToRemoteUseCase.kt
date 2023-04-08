@@ -1,19 +1,12 @@
 package com.vadymhalaziuk.istesttask.domain
 
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel
+import com.vadymhalaziuk.istesttask.utils.currentDayOfWeek
 import java.time.DayOfWeek
 import java.util.*
+import javax.inject.Inject
 
-class FilterActionAccordingToRemoteUseCase {
-
-    private val currentDay: DayOfWeek
-        //TODO fix DRY principle
-        get() = requireNotNull(
-            DayOfWeek.values()
-                .find {
-                    it.ordinal == Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1
-                }
-        )
+class FilterActionAccordingToRemoteUseCase @Inject constructor() {
 
     operator fun invoke(domainModels: List<ActionDomainModel>): List<ActionDomainModel> =
         domainModels.filter {
@@ -23,5 +16,5 @@ class FilterActionAccordingToRemoteUseCase {
         }
 
     private fun filterByCurrentDay(domainModel: ActionDomainModel): Boolean =
-        currentDay in domainModel.days
+        currentDayOfWeek() in domainModel.days
 }

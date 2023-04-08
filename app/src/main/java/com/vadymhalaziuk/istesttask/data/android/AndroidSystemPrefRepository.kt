@@ -4,9 +4,17 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.isActive
+import kotlinx.coroutines.isActive
+import javax.inject.Inject
 
-class AndroidSystemPrefRepository(
-    private val context: Context,
+class AndroidSystemPrefRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
 ) {
 
 
@@ -36,4 +44,15 @@ class AndroidSystemPrefRepository(
             } ?: false
         }
     }
+
+    fun isInternetAvailableFlow(frequency: Long = 500L): Flow<Boolean> =
+        flow {
+            while (true) {
+                if (!currentCoroutineContext().isActive) return@flow
+
+                emit(isInternetAvailable())
+
+                delay(frequency)
+            }
+        }
 }

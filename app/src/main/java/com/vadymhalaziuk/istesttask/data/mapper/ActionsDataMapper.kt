@@ -4,8 +4,9 @@ import com.vadymhalaziuk.istesttask.data.remote.ActionDtoItem
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainType
 import java.time.DayOfWeek
+import javax.inject.Inject
 
-class ActionsDataMapper {
+class ActionsDataMapper @Inject constructor() {
 
     operator fun invoke(dtos: List<ActionDtoItem?>): List<ActionDomainModel> =
         dtos.mapNotNull {

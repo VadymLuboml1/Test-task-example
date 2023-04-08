@@ -3,8 +3,9 @@ package com.vadymhalaziuk.istesttask.data
 import com.vadymhalaziuk.istesttask.data.local.AppSharedPrefStorage
 import com.vadymhalaziuk.istesttask.data.mapper.ActionDataLocalMapper
 import com.vadymhalaziuk.istesttask.domain.model.ActionCooledDownDomainModel
+import javax.inject.Inject
 
-class AppPrefsRepository(
+class AppPrefsRepository @Inject constructor(
     private val storage: AppSharedPrefStorage,
     private val mapper: ActionDataLocalMapper,
 ) {
