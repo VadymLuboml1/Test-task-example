@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.isActive
 import kotlinx.coroutines.isActive
@@ -54,5 +55,5 @@ class AndroidSystemPrefRepository @Inject constructor(
 
                 delay(frequency)
             }
-        }
+        }.distinctUntilChanged()
 }

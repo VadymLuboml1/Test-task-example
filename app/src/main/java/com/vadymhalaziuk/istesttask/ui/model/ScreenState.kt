@@ -3,7 +3,7 @@ package com.vadymhalaziuk.istesttask.ui.model
 import androidx.annotation.StringRes
 
 data class ScreenState(
-    val content: ActionContentType? = null,
+    val content: ActionButtonContent? = null,
     val isLoading: Boolean = false,
     @StringRes val errorText: Int? = null,
 ) {
@@ -12,9 +12,9 @@ data class ScreenState(
      * Next methods used for manipulation with current screen state
      * */
 
-    fun content(content: ActionContentType): ScreenState =
+    fun content(contentChanging: ActionButtonContent.() -> ActionButtonContent): ScreenState =
         copy(
-            content = content,
+            content = content?.contentChanging(),
             isLoading = false,
             errorText = null,
         )
@@ -25,15 +25,11 @@ data class ScreenState(
             errorText = null,
         )
 
-    fun error(@StringRes errorText: Int): ScreenState =
+    fun error(@StringRes errorText: Int?): ScreenState =
         copy(
             isLoading = false,
             errorText = errorText,
         )
-
-    companion object Initial {
-        val Loading = ScreenState(isLoading = true)
-    }
 
 }
 

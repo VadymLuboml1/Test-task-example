@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -13,10 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vadymhalaziuk.istesttask.ui.model.ActionEffect
+import com.vadymhalaziuk.istesttask.ui.theme.ActionDialog
 
 @Composable
 fun ActionsComposition(viewModel: ActionsViewModel = viewModel()) {
@@ -25,21 +23,25 @@ fun ActionsComposition(viewModel: ActionsViewModel = viewModel()) {
         val screenState = viewModel.state.collectAsState()
         val effect = viewModel.effect.collectAsState(initial = null)
 
+        val startAnimation = remember {
+            mutableStateOf<Int>(startAnimationInitState)
+        }
+
         effect.value?.let {
-            HandleEffect(effect = it)
+            HandleEffect(effect = it) { startAnimation.value++ }
         }
 
         screenState.value.errorText?.let {
             ErrorRow(error = it, paddingValues = paddingVal)
         }
 
-        Box(modifier = Modifier
-            .padding(paddingVal)
-            .fillMaxSize()) {
-
-
+        ActionButtonContainer(paddingVal) {
+            screenState.value.content?.let {
+                ActionButton(it, startAnimation.value) { event ->
+                    viewModel.onEvent(event)
+                }
+            }
         }
-
     }
 
 }
@@ -63,36 +65,44 @@ private fun ErrorRow(@StringRes error: Int, paddingValues: PaddingValues) {
 }
 
 @Composable
-private fun ActionButton(){
-
-    Button(onClick = {}) {
-        Text("Stub")
+private fun ActionButtonContainer(
+    paddingVal: PaddingValues, content: @Composable BoxScope.() -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .padding(paddingVal)
+            .fillMaxSize()
+    ) {
+        content()
     }
 }
 
 @Composable
-private fun HandleEffect(effect: ActionEffect) {
+private fun HandleEffect(effect: ActionEffect, startAnimation: () -> Unit) {
     when (effect) {
         is ActionEffect.Dialog -> {
 
-            var showDialog by remember {
+            var showDialog by remember(effect.composeKey) {
                 mutableStateOf<Boolean>(true)
             }
 
             if (showDialog) {
-                Dialog(onDismissRequest = { showDialog = false }) {
-                    Box(Modifier.size(100.dp)) {
-                        Column {
-                            Text(text = stringResource(effect.title), color = Color.Black)
-
-                            Text(text = stringResource(effect.subtitle), color = Color.Black)
-                        }
-                    }
-                }
+                ActionDialog(effect.title, effect.subtitle) { showDialog = false }
             }
         }
         is ActionEffect.Toast -> {
-            Toast.makeText(LocalContext.current, effect.content, Toast.LENGTH_LONG).show()
+            val context = LocalContext.current
+
+            LaunchedEffect(key1 = Unit) {
+                Toast.makeText(context, effect.content, Toast.LENGTH_LONG).show()
+            }
+        }
+        is ActionEffect.ShowAnimation -> {
+            LaunchedEffect(key1 = effect.composeKey) {
+                startAnimation()
+            }
         }
     }
 }
+
+const val startAnimationInitState = 0
