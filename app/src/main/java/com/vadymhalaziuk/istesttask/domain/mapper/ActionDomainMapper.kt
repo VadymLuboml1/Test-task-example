@@ -7,7 +7,7 @@ class ActionDomainMapper @Inject constructor() {
 
     fun mapError(throwable: Throwable): ActionDomainError =
         when (throwable) {
-            is IndexOutOfBoundsException -> ActionDomainError.NoAvailable
+            is NoSuchElementException -> ActionDomainError.NoAvailable
             else -> ActionDomainError.Unknown
         }
 

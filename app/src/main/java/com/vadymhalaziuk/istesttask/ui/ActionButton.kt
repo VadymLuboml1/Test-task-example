@@ -7,13 +7,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContent
+import com.vadymhalaziuk.istesttask.R
+import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContentState
 import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
+import com.vadymhalaziuk.istesttask.utils.toTriple
 
 @Composable
 fun ActionButton(
-    model: ActionButtonContent,
+    model: ActionButtonContentState,
     animationKey: Int,
     onEvent: (ActionEvent) -> Unit
 ) {
@@ -32,6 +35,14 @@ fun ActionButton(
         }
     }
 
+    val (text, color, clickEvent) = when (model) {
+        ActionButtonContentState.ENABLED -> {
+            R.string.active_button to Color.Green toTriple ActionEvent.Click
+        }
+        ActionButtonContentState.DISABLED -> {
+            R.string.disabled_button to Color.Gray toTriple ActionEvent.ClickWhileDisabled
+        }
+    }
 
     Button(
         modifier = Modifier
@@ -40,14 +51,14 @@ fun ActionButton(
             onEvent(
                 when {
                     rotation.isRunning -> ActionEvent.ClickWhileAnimation
-                    else -> ActionEvent.Click
+                    else -> clickEvent
                 }
             )
         }
     ) {
         Text(
-            text = stringResource(model.text),
-            color = model.color
+            text = stringResource(text),
+            color = color
         )
     }
 }

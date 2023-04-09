@@ -20,4 +20,8 @@ class TrackActionUseCase @Inject constructor(
             )
         )
     }
+
+    companion object {
+        val actionsWithAssurance: List<ActionDomainType> = listOf(ActionDomainType.NOTIFICATION)
+    }
 }

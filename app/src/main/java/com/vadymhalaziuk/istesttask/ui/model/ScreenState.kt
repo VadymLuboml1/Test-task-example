@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 
 @Stable
 data class ScreenState(
-    val content: ActionButtonContent? = null,
+    val content: ActionButtonContentState? = null,
     val isLoading: Boolean = false,
     @StringRes val errorText: Int? = null,
 ) {
@@ -14,7 +14,7 @@ data class ScreenState(
      * Next methods used for manipulation with current screen state
      * */
 
-    fun content(contentChanging: ActionButtonContent.() -> ActionButtonContent): ScreenState =
+    fun content(contentChanging: ActionButtonContentState.() -> ActionButtonContentState): ScreenState =
         copy(
             content = content?.contentChanging(),
             isLoading = false,

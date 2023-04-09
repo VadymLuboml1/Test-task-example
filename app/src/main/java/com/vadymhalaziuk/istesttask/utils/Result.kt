@@ -24,16 +24,20 @@ sealed class Result<out T, out E>(
     val isError
         get() = _error != null
 
-    inline fun ifSuccess(invoke: () -> Unit) {
+    inline fun ifSuccess(invoke: (T) -> Unit): Result<T, E> {
         if (isSuccess) {
-            invoke()
+            invoke(value)
         }
+
+        return this
     }
 
-    inline fun ifError(invoke: (E) -> Unit) {
+    inline fun ifError(invoke: (E) -> Unit): Result<T, E> {
         if (isError) {
             invoke(error)
         }
+
+        return this
     }
 
 

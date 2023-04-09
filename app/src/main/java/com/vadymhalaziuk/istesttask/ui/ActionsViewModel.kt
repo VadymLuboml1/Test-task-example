@@ -1,16 +1,16 @@
 package com.vadymhalaziuk.istesttask.ui
 
 import androidx.annotation.StringRes
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vadymhalaziuk.istesttask.R
 import com.vadymhalaziuk.istesttask.di.qualifiers.IoDispatcher
 import com.vadymhalaziuk.istesttask.domain.GetActionUseCase
 import com.vadymhalaziuk.istesttask.domain.TrackActionUseCase
+import com.vadymhalaziuk.istesttask.domain.model.ActionDomainError
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainType
 import com.vadymhalaziuk.istesttask.domain.repository.AndroidSystemPrefRepository
-import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContent
+import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContentState
 import com.vadymhalaziuk.istesttask.ui.model.ActionEffect
 import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
 import com.vadymhalaziuk.istesttask.ui.model.ScreenState
@@ -21,10 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private val initialState = ScreenState(
-    content = ActionButtonContent(
-        text = R.string.start_button,
-        color = Color.Green
-    )
+    content = ActionButtonContentState.ENABLED
 )
 
 @HiltViewModel
@@ -70,7 +67,16 @@ class ActionsViewModel @Inject constructor(
                     R.string.unable_to_send_push_subtitle,
                 )
             }
-            is ActionEvent.NotificationSent -> {}
+            is ActionEvent.ClickWhileDisabled -> {
+                emitDialog(
+                    R.string.unable_to_make_click_title, R.string.unable_to_make_click_subtitle
+                )
+            }
+            is ActionEvent.NotificationSent -> {
+                viewModelScope.launch(ioDispatcher) {
+                    trackAction(ActionDomainType.NOTIFICATION)
+                }
+            }
         }
     }
 
@@ -83,24 +89,42 @@ class ActionsViewModel @Inject constructor(
 
             _effect.emit(ActionEffect.Notification(R.string.push_title))
 
-            when {
-                actionTypeResult.isSuccess -> {
-                    _effect.emit(
-                        when (actionTypeResult.value) {
-                            ActionDomainType.ANIMATION -> ActionEffect.ShowAnimation()
-                            ActionDomainType.TOAST -> ActionEffect.Toast(R.string.success_action_title)
-                            ActionDomainType.NOTIFICATION -> ActionEffect.Notification(R.string.success_action_title)
-                            else -> {
-                                _state.update { it.loading(false) }
-                                return@launch
-                            }
-                        }
-                    )
+            actionTypeResult.ifSuccess { actionType ->
+
+                if (actionType !in TrackActionUseCase.actionsWithAssurance) {
+                    viewModelScope.launch(ioDispatcher) {
+                        trackAction(actionType)
+                    }
                 }
-                else -> emitDialog(
-                    title = R.string.unknown_error_title,
-                    subtitle = R.string.unknown_error_subtitle
+
+                _effect.emit(
+                    when (actionType) {
+                        ActionDomainType.ANIMATION -> ActionEffect.ShowAnimation()
+                        ActionDomainType.TOAST -> ActionEffect.Toast(R.string.success_action_title)
+                        ActionDomainType.NOTIFICATION -> ActionEffect.Notification(R.string.success_action_title)
+                        else -> {
+                            _state.update { it.loading(false) }
+                            return@launch
+                        }
+                    }
                 )
+            }.ifError { errorType ->
+                when (errorType) {
+                    is ActionDomainError.NoAvailable -> {
+                        _state.update { it.content { ActionButtonContentState.DISABLED } }
+
+                        emitDialog(
+                            R.string.unable_to_make_click_title,
+                            R.string.unable_to_make_click_subtitle
+                        )
+                    }
+                    else -> {
+                        emitDialog(
+                            title = R.string.unknown_error_title,
+                            subtitle = R.string.unknown_error_subtitle
+                        )
+                    }
+                }
             }
 
             _state.update { it.loading(false) }
