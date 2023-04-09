@@ -5,6 +5,9 @@ enum class ActionDomainType {
 
     TOAST,
 
+    /**
+     * Not implemented
+     * */
     CALL,
 
     NOTIFICATION;

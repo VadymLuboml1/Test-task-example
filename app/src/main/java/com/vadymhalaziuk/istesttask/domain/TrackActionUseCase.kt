@@ -1,8 +1,8 @@
 package com.vadymhalaziuk.istesttask.domain
 
-import com.vadymhalaziuk.istesttask.data.AppPrefsRepository
 import com.vadymhalaziuk.istesttask.domain.model.ActionCooledDownDomainModel
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainType
+import com.vadymhalaziuk.istesttask.domain.repository.AppPrefsRepository
 import javax.inject.Inject
 
 class TrackActionUseCase @Inject constructor(
@@ -12,7 +12,7 @@ class TrackActionUseCase @Inject constructor(
     private val currentTimeStamp
         get() = System.currentTimeMillis()
 
-    operator fun invoke(actionDomainType: ActionDomainType) {
+    suspend operator fun invoke(actionDomainType: ActionDomainType) {
         appPrefsRepository.saveCooledDown(
             ActionCooledDownDomainModel(
                 actionDomainType,

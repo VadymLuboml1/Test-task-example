@@ -30,9 +30,9 @@ sealed class Result<out T, out E>(
         }
     }
 
-    inline fun ifError(invoke: () -> Unit) {
+    inline fun ifError(invoke: (E) -> Unit) {
         if (isError) {
-            invoke()
+            invoke(error)
         }
     }
 
@@ -40,10 +40,21 @@ sealed class Result<out T, out E>(
     companion object {
         fun <T> safeResult(invoke: () -> T): Result<T, ErrorType> {
             return kotlin.runCatching {
-                Result.Success(
+                Success(
                     invoke()
                 )
-            }.getOrElse { Result.Error(ErrorType.Unknown) }
+            }.getOrElse { Error(ErrorType.Unknown) }
+        }
+
+        fun <T, E> safeResult(
+            mapException: (Throwable) -> E,
+            invoke: () -> T,
+        ): Result<T, E> {
+            return kotlin.runCatching {
+                Success(
+                    invoke()
+                )
+            }.getOrElse { Error(mapException(it)) }
         }
     }
 

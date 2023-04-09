@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import com.vadymhalaziuk.istesttask.domain.repository.AndroidSystemPrefRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -14,16 +15,15 @@ import kotlinx.coroutines.isActive
 import javax.inject.Inject
 
 //TODO check sigletons
-class AndroidSystemPrefRepository @Inject constructor(
+class AndroidSystemPrefRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-) {
+) : AndroidSystemPrefRepository {
 
 
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-
-    fun isInternetAvailable(): Boolean {
+    override fun isInternetAvailable(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val networkCapabilities = connectivityManager.activeNetwork ?: return false
             val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities)
@@ -46,7 +46,7 @@ class AndroidSystemPrefRepository @Inject constructor(
         }
     }
 
-    fun isInternetAvailableFlow(frequency: Long = 500L): Flow<Boolean> =
+    override fun isInternetAvailableFlow(frequency: Long): Flow<Boolean> =
         flow {
             while (true) {
                 if (!currentCoroutineContext().isActive) return@flow

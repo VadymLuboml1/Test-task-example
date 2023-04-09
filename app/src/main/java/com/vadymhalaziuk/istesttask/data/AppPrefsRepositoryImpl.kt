@@ -3,26 +3,25 @@ package com.vadymhalaziuk.istesttask.data
 import com.vadymhalaziuk.istesttask.data.local.AppSharedPrefStorage
 import com.vadymhalaziuk.istesttask.data.mapper.ActionDataLocalMapper
 import com.vadymhalaziuk.istesttask.domain.model.ActionCooledDownDomainModel
+import com.vadymhalaziuk.istesttask.domain.repository.AppPrefsRepository
 import javax.inject.Inject
 
-class AppPrefsRepository @Inject constructor(
+class AppPrefsRepositoryImpl @Inject constructor(
     private val storage: AppSharedPrefStorage,
     private val mapper: ActionDataLocalMapper,
-) {
+) : AppPrefsRepository {
 
 
-    val cooledDownList: List<ActionCooledDownDomainModel>
-        get() = storage.cooledDownActions.let { mapper.toDomain(it) }
+    override suspend fun getCooledDownList(): List<ActionCooledDownDomainModel> =
+        storage.cooledDownActions.let { mapper.toDomain(it) }
 
-    fun saveCooledDownList(domainModels: List<ActionCooledDownDomainModel>) =
-        mapper.toLocal(domainModels).let {
-            storage.cooledDownActions = it
-        }
 
-    fun saveCooledDown(domainModel: ActionCooledDownDomainModel) =
-        mutableListOf(
+    override suspend fun saveCooledDown(domainModel: ActionCooledDownDomainModel): Unit {
+        storage.cooledDownActions = mutableListOf(
             *storage.cooledDownActions.toTypedArray(),
             mapper.toLocal(domainModel)
         )
+    }
+
 
 }

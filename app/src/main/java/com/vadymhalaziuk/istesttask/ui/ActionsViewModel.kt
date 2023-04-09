@@ -1,15 +1,15 @@
 package com.vadymhalaziuk.istesttask.ui
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vadymhalaziuk.istesttask.R
-import com.vadymhalaziuk.istesttask.data.android.AndroidSystemPrefRepository
 import com.vadymhalaziuk.istesttask.di.qualifiers.IoDispatcher
 import com.vadymhalaziuk.istesttask.domain.GetActionUseCase
 import com.vadymhalaziuk.istesttask.domain.TrackActionUseCase
+import com.vadymhalaziuk.istesttask.domain.model.ActionDomainType
+import com.vadymhalaziuk.istesttask.domain.repository.AndroidSystemPrefRepository
 import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContent
 import com.vadymhalaziuk.istesttask.ui.model.ActionEffect
 import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
@@ -79,20 +79,28 @@ class ActionsViewModel @Inject constructor(
 
             _state.update { it.loading() }
 
-            val value = getActionUseCase()
+            val actionTypeResult = getActionUseCase()
 
             _effect.emit(ActionEffect.Notification(R.string.push_title))
 
             when {
-                value.isSuccess -> {
-                    val type = value.getOrNull()?.type
-
-                    Log.d("vadymLog", "received action $type")
-
-
+                actionTypeResult.isSuccess -> {
+                    _effect.emit(
+                        when (actionTypeResult.value) {
+                            ActionDomainType.ANIMATION -> ActionEffect.ShowAnimation()
+                            ActionDomainType.TOAST -> ActionEffect.Toast(R.string.success_action_title)
+                            ActionDomainType.NOTIFICATION -> ActionEffect.Notification(R.string.success_action_title)
+                            else -> {
+                                _state.update { it.loading(false) }
+                                return@launch
+                            }
+                        }
+                    )
                 }
-                else -> Unit//TODO show error
-
+                else -> emitDialog(
+                    title = R.string.unknown_error_title,
+                    subtitle = R.string.unknown_error_subtitle
+                )
             }
 
             _state.update { it.loading(false) }
@@ -119,10 +127,4 @@ class ActionsViewModel @Inject constructor(
                 )
             )
         }
-
-
-    private fun handleActionState() {
-
-    }
-
 }
