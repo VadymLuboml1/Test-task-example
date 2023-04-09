@@ -1,5 +1,6 @@
-package com.vadymhalaziuk.istesttask.data.remote
+package com.vadymhalaziuk.istesttask.data.remote.source
 
+import com.vadymhalaziuk.istesttask.data.remote.model.ActionDtoItem
 import retrofit2.Response
 import retrofit2.http.GET
 

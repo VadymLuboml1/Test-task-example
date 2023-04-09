@@ -13,8 +13,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import javax.inject.Inject
+import javax.inject.Singleton
 
-//TODO check sigletons
+@Singleton
 class AndroidSystemPrefRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AndroidSystemPrefRepository {

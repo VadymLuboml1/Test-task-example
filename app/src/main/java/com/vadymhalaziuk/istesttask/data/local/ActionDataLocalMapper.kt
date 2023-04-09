@@ -1,4 +1,4 @@
-package com.vadymhalaziuk.istesttask.data.mapper
+package com.vadymhalaziuk.istesttask.data.local
 
 import com.vadymhalaziuk.istesttask.data.local.model.CooledDownActionLocalDto
 import com.vadymhalaziuk.istesttask.domain.model.ActionCooledDownDomainModel
@@ -20,7 +20,7 @@ class ActionDataLocalMapper @Inject constructor() {
     ): List<CooledDownActionLocalDto> =
         domainModels.map {
             CooledDownActionLocalDto(
-                it.type.name,
+                type = it.type.name,
                 lastActionTimestamp = it.coolDown,
             )
         }
@@ -29,7 +29,7 @@ class ActionDataLocalMapper @Inject constructor() {
         domainModels: ActionCooledDownDomainModel,
     ): CooledDownActionLocalDto =
         CooledDownActionLocalDto(
-            domainModels.type.name,
-            domainModels.coolDown,
+            type = domainModels.type.name,
+            lastActionTimestamp = domainModels.coolDown,
         )
 }

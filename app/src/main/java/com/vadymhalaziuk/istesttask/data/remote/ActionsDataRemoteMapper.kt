@@ -1,12 +1,12 @@
-package com.vadymhalaziuk.istesttask.data.mapper
+package com.vadymhalaziuk.istesttask.data.remote
 
-import com.vadymhalaziuk.istesttask.data.remote.ActionDtoItem
+import com.vadymhalaziuk.istesttask.data.remote.model.ActionDtoItem
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainType
 import java.time.DayOfWeek
 import javax.inject.Inject
 
-class ActionsDataMapper @Inject constructor() {
+class ActionsDataRemoteMapper @Inject constructor() {
 
     operator fun invoke(dtos: List<ActionDtoItem?>): List<ActionDomainModel> =
         dtos.mapNotNull {

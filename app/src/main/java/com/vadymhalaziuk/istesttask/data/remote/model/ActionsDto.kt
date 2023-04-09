@@ -1,4 +1,4 @@
-package com.vadymhalaziuk.istesttask.data.remote
+package com.vadymhalaziuk.istesttask.data.remote.model
 
 import com.google.gson.annotations.SerializedName
 

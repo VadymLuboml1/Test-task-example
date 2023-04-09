@@ -1,15 +1,16 @@
-package com.vadymhalaziuk.istesttask.data
+package com.vadymhalaziuk.istesttask.data.remote
 
 import android.util.Log
-import com.vadymhalaziuk.istesttask.data.mapper.ActionsDataMapper
-import com.vadymhalaziuk.istesttask.data.remote.ActionsRestApi
+import com.vadymhalaziuk.istesttask.data.remote.source.ActionsRestApi
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel
 import com.vadymhalaziuk.istesttask.domain.repository.RemoteActionsRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class RemoteActionsRepository @Inject constructor(
     private val api: ActionsRestApi,
-    private val mapper: ActionsDataMapper,
+    private val mapper: ActionsDataRemoteMapper,
 ) : RemoteActionsRepository {
 
     override suspend fun getActions(): Result<List<ActionDomainModel>> =

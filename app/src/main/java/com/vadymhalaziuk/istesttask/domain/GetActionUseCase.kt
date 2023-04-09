@@ -1,7 +1,7 @@
 package com.vadymhalaziuk.istesttask.domain
 
 import android.util.Log
-import com.vadymhalaziuk.istesttask.data.RemoteActionsRepository
+import com.vadymhalaziuk.istesttask.data.remote.RemoteActionsRepository
 import com.vadymhalaziuk.istesttask.domain.mapper.ActionDomainMapper
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainError
 import com.vadymhalaziuk.istesttask.domain.model.ActionDomainModel

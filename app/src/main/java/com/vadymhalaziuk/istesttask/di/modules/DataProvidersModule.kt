@@ -1,9 +1,10 @@
 package com.vadymhalaziuk.istesttask.di.modules
 
-import com.vadymhalaziuk.istesttask.data.AppPrefsRepositoryImpl
 import com.vadymhalaziuk.istesttask.data.android.AndroidSystemPrefRepositoryImpl
+import com.vadymhalaziuk.istesttask.data.local.LocalActionsRepositoryImpl
+import com.vadymhalaziuk.istesttask.data.remote.RemoteActionsRepository
 import com.vadymhalaziuk.istesttask.domain.repository.AndroidSystemPrefRepository
-import com.vadymhalaziuk.istesttask.domain.repository.AppPrefsRepository
+import com.vadymhalaziuk.istesttask.domain.repository.LocalActionsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,8 +18,8 @@ abstract class DataProvidersModule {
     abstract fun androidSystemPrefRepository(impl: AndroidSystemPrefRepositoryImpl): AndroidSystemPrefRepository
 
     @Binds
-    abstract fun appPrefsRepository(impl: AppPrefsRepositoryImpl): AppPrefsRepository
+    abstract fun appPrefsRepository(impl: LocalActionsRepositoryImpl): LocalActionsRepository
 
     @Binds
-    abstract fun remoteActionsRepository(impl: com.vadymhalaziuk.istesttask.data.RemoteActionsRepository): com.vadymhalaziuk.istesttask.domain.repository.RemoteActionsRepository
+    abstract fun remoteActionsRepository(impl: RemoteActionsRepository): com.vadymhalaziuk.istesttask.domain.repository.RemoteActionsRepository
 }
