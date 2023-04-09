@@ -6,4 +6,7 @@ sealed class ActionEvent {
 
     object ClickWhileAnimation : ActionEvent()
 
+    object NotificationSent : ActionEvent()
+    object NotificationAccessDenied : ActionEvent()
+
 }

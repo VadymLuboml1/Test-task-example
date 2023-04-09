@@ -7,4 +7,16 @@
     <string name="internet_error_title">Sorry you have no internet</string>
     <string name="internet_error_subtitle">Try later please</string>
 
+    <string name="wait_animation_end_title">Wait for animation end</string>
+    <string name="wait_animation_end_subtitle">And try again</string>
+
+    <string name="unable_to_send_push_title">Unable to send push</string>
+    <string name="unable_to_send_push_subtitle">Please switch on permission</string>
+
+    <string name="push_title">Hello world</string>
+
+
+    <string name="notificationChannelId" translatable="false">Notification channel Identifier</string>
+    <string name="notificationChannelName" translatable="false">Notification channel</string>
+
 </resources>

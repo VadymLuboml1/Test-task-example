@@ -1,7 +1,9 @@
 package com.vadymhalaziuk.istesttask.ui.model
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Stable
 
+@Stable
 data class ScreenState(
     val content: ActionButtonContent? = null,
     val isLoading: Boolean = false,

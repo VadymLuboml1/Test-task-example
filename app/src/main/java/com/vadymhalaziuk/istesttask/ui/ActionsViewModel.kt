@@ -1,6 +1,7 @@
 package com.vadymhalaziuk.istesttask.ui
 
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,17 +54,34 @@ class ActionsViewModel @Inject constructor(
     }
 
     fun onEvent(event: ActionEvent) {
-        Log.d("vadymLog", "onClick")
-
         checkInternet { return }
 
+        when (event) {
+            is ActionEvent.ClickWhileAnimation -> {
+                emitDialog(
+                    R.string.wait_animation_end_title,
+                    R.string.wait_animation_end_subtitle,
+                )
+            }
+            is ActionEvent.Click -> executeAction()
+            is ActionEvent.NotificationAccessDenied -> {
+                emitDialog(
+                    R.string.unable_to_send_push_title,
+                    R.string.unable_to_send_push_subtitle,
+                )
+            }
+            is ActionEvent.NotificationSent -> {}
+        }
+    }
+
+    private fun executeAction() {
         viewModelScope.launch(ioDispatcher) {
 
             _state.update { it.loading() }
 
             val value = getActionUseCase()
 
-            _effect.emit(ActionEffect.ShowAnimation())
+            _effect.emit(ActionEffect.Notification(R.string.push_title))
 
             when {
                 value.isSuccess -> {
@@ -76,23 +94,31 @@ class ActionsViewModel @Inject constructor(
                 else -> Unit//TODO show error
 
             }
+
+            _state.update { it.loading(false) }
         }
     }
 
-    private inline fun checkInternet(finish: () -> Unit) {
+    private inline fun checkInternet(invokeOnDisabled: () -> Unit) {
         if (!systemPrefRepository.isInternetAvailable()) {
-            viewModelScope.launch {
-                _effect.emit(
-                    ActionEffect.Dialog(
-                        title = R.string.internet_error_title,
-                        subtitle = R.string.internet_error_subtitle,
-                    )
-                )
-            }
+            emitDialog(
+                title = R.string.internet_error_title,
+                subtitle = R.string.internet_error_subtitle
+            )
 
-            finish()
+            invokeOnDisabled()
         }
     }
+
+    private fun emitDialog(@StringRes title: Int, @StringRes subtitle: Int) =
+        viewModelScope.launch {
+            _effect.emit(
+                ActionEffect.Dialog(
+                    title = title,
+                    subtitle = subtitle,
+                )
+            )
+        }
 
 
     private fun handleActionState() {

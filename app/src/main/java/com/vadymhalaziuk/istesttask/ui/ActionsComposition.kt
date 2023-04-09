@@ -1,23 +1,29 @@
 package com.vadymhalaziuk.istesttask.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.os.Build
 import android.widget.Toast
-import androidx.annotation.StringRes
-import androidx.compose.foundation.background
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vadymhalaziuk.istesttask.ui.model.ActionEffect
+import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
 import com.vadymhalaziuk.istesttask.ui.theme.ActionDialog
+import com.vadymhalaziuk.istesttask.utils.sendNotification
 
 @Composable
-fun ActionsComposition(viewModel: ActionsViewModel = viewModel()) {
+fun ActionsComposition(
+    viewModel: ActionsViewModel = viewModel(),
+) {
     Scaffold { paddingVal ->
 
         val screenState = viewModel.state.collectAsState()
@@ -28,17 +34,27 @@ fun ActionsComposition(viewModel: ActionsViewModel = viewModel()) {
         }
 
         effect.value?.let {
-            HandleEffect(effect = it) { startAnimation.value++ }
+            HandleEffect(
+                effect = it,
+                startAnimation = { startAnimation.value++ },
+                onEvent = viewModel::onEvent
+            )
         }
 
         screenState.value.errorText?.let {
             ErrorRow(error = it, paddingValues = paddingVal)
         }
 
-        ActionButtonContainer(paddingVal) {
-            screenState.value.content?.let {
-                ActionButton(it, startAnimation.value) { event ->
-                    viewModel.onEvent(event)
+        ScreenContainer(paddingVal) {
+            with(screenState.value) {
+                if (isLoading) {
+                    LinearProgressIndicator()
+                }
+
+                content?.let {
+                    ActionButton(it, startAnimation.value) { event ->
+                        viewModel.onEvent(event)
+                    }
                 }
             }
         }
@@ -47,38 +63,31 @@ fun ActionsComposition(viewModel: ActionsViewModel = viewModel()) {
 }
 
 @Composable
-private fun ErrorRow(@StringRes error: Int, paddingValues: PaddingValues) {
-    Row(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxWidth()
-            .background(Color.Red),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-
-        Text(
-            text = stringResource(id = error),
-            color = Color.Black,
-        )
-    }
-}
-
-@Composable
-private fun ActionButtonContainer(
-    paddingVal: PaddingValues, content: @Composable BoxScope.() -> Unit
+private fun ScreenContainer(
+    paddingVal: PaddingValues, content: @Composable () -> Unit
 ) {
     Box(
         modifier = Modifier
             .padding(paddingVal)
             .fillMaxSize()
     ) {
-        content()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            content()
+        }
     }
 }
 
+@SuppressLint("MissingPermission")
 @Composable
-private fun HandleEffect(effect: ActionEffect, startAnimation: () -> Unit) {
+private fun HandleEffect(
+    effect: ActionEffect,
+    startAnimation: () -> Unit,
+    onEvent: (ActionEvent) -> Unit,
+) {
     when (effect) {
         is ActionEffect.Dialog -> {
 
@@ -101,6 +110,41 @@ private fun HandleEffect(effect: ActionEffect, startAnimation: () -> Unit) {
             LaunchedEffect(key1 = effect.composeKey) {
                 startAnimation()
             }
+        }
+        is ActionEffect.Notification -> SendNotification(effect, onEvent)
+    }
+}
+
+@SuppressLint("MissingPermission")
+@Composable
+private fun SendNotification(effect: ActionEffect.Notification, onEvent: (ActionEvent) -> Unit) {
+    val context = LocalContext.current
+
+    val (title, subtitle) =
+        stringResource(effect.title) to
+                effect.subtitle?.let { stringResource(it) }
+
+    val sendNotification = { context.sendNotification(title, subtitle) }
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+            val event = when {
+                permissionGranted -> {
+                    sendNotification()
+
+                    ActionEvent.NotificationSent
+                }
+                else -> ActionEvent.NotificationAccessDenied
+            }
+
+            onEvent(event)
+        }
+
+    LaunchedEffect(key1 = effect.composeKey) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            sendNotification()
         }
     }
 }

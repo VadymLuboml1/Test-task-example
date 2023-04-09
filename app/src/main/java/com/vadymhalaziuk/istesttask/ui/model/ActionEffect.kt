@@ -5,6 +5,12 @@ import kotlin.random.Random
 
 sealed class ActionEffect {
 
+    data class Notification(
+        @StringRes val title: Int,
+        @StringRes val subtitle: Int? = null,
+        val composeKey: Int = Random.nextInt(),
+    ) : ActionEffect()
+
     data class Dialog(
         @StringRes val title: Int,
         @StringRes val subtitle: Int,
