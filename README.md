@@ -18,23 +18,36 @@ Config values that apply to all actions
 The way an action is chosen is according to the configuration values retrieved from the configuration json above.
 
 The configuration values:
+
 ● enabled (boolean)
+
 ○ a disabled action can never be chosen
 
+
 ● priority (int)
+
 ○ if action X has a higher priority than action Y, action X will be selected
+
 ○ If two actions have the same priority, choose one at random.
 
+
 ● valid days (days array)
+
 ○ valid days to choose the action
+
 ○ for example, we can set the “Animation action” action to be choosable only on
 Monday-Thursday
 
+
 ● cool down period (long)
+
 ○ cool down period between choosing an action that was already chosen
+
 ○ for example, if an action has a 3 day (1000*60*60*24*3) cool down period, it can’t
 be chosen for 3 days after it was shown to the user
+
 ○ this should persist across app runs
+
 
 Filters that apply to specific actions
 
