@@ -1,4 +1,4 @@
-package com.vadymhalaziuk.istesttask.ui
+package com.vadymhalaziuk.istesttask.ui.elements
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import com.vadymhalaziuk.istesttask.R
 import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContentState
 import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
+import com.vadymhalaziuk.istesttask.ui.startAnimationInitState
 import com.vadymhalaziuk.istesttask.utils.toTriple
 
 @Composable

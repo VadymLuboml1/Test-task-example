@@ -1,4 +1,4 @@
-package com.vadymhalaziuk.istesttask.ui
+package com.vadymhalaziuk.istesttask.ui.elements
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background

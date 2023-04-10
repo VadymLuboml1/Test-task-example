@@ -18,8 +18,8 @@ class RemoteActionsRepository @Inject constructor(
             Log.d("vadymLog", "received action from BE $it")
 
         }.runCatching {
-            Log.d("vadymLog", "received action from BE ${this.body().toString()}")
+            Log.d("vadymLog", "received action from BE ${this.body()?.toString().orEmpty()}")
 
-            mapper(this.body()!!)
+            mapper(requireNotNull(body()))
         }
 }
