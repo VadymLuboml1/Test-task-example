@@ -16,7 +16,7 @@ class GetActionUseCase @Inject constructor(
     private val sortActionsUseCase: SortActionsUseCase,
     private val remoteActionsRepository: RemoteActionsRepository,
     private val filterActionAccordingToLocal: FilterActionAccordingToLocalConditionsUseCase,
-    private val filterActionAccordingToRemoteUseCase: FilterActionAccordingToRemoteConditionsUseCase,
+    private val filterActionAccordingToRemote: FilterActionAccordingToRemoteConditionsUseCase,
 ) {
 
     suspend operator fun invoke(): Result<ActionDomainType, ActionDomainError> =
@@ -24,7 +24,7 @@ class GetActionUseCase @Inject constructor(
             Log.d("vadymLog", "received domain $it")
 
         }.map {
-            filterActionAccordingToRemoteUseCase(it)
+            filterActionAccordingToRemote(it)
         }.map {
             filterActionAccordingToLocal(it)
         }.map {

@@ -11,11 +11,11 @@ class FilterActionAccordingToLocalConditionsUseCase @Inject constructor(
 
     suspend operator fun invoke(actions: List<ActionDomainModel>): List<ActionDomainModel> {
         return actions.filter {
-            filterAccodingToColdDown(it)
+            filterAccordingToColdDown(it)
         }
     }
 
-    private suspend fun filterAccodingToColdDown(
+    private suspend fun filterAccordingToColdDown(
         action: ActionDomainModel
     ): Boolean {
         val recordedAction =

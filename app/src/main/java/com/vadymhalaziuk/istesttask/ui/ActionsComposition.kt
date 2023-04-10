@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vadymhalaziuk.istesttask.ui.model.ActionEffect
 import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
-import com.vadymhalaziuk.istesttask.ui.theme.ActionDialog
 import com.vadymhalaziuk.istesttask.utils.sendNotification
 
 @Composable
@@ -102,7 +101,7 @@ private fun HandleEffect(
         is ActionEffect.Toast -> {
             val context = LocalContext.current
 
-            LaunchedEffect(key1 = Unit) {
+            LaunchedEffect(key1 = effect.composeKey) {
                 Toast.makeText(context, effect.content, Toast.LENGTH_LONG).show()
             }
         }

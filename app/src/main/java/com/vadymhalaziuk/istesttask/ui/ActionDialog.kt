@@ -1,4 +1,4 @@
-package com.vadymhalaziuk.istesttask.ui.theme
+package com.vadymhalaziuk.istesttask.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -11,17 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.vadymhalaziuk.istesttask.ui.theme.dialogHeight
+import com.vadymhalaziuk.istesttask.ui.theme.dialogWidth
 
 @Composable
-fun ActionDialog(@StringRes title: Int, @StringRes subtitle: Int, onDismiss : () -> Unit){
+fun ActionDialog(@StringRes title: Int, @StringRes subtitle: Int, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Box(
             Modifier
                 .size(
-                    width = 200.dp,
-                    height = 100.dp
+                    width = dialogWidth,
+                    height = dialogHeight,
                 )
                 .background(Color.White)
         ) {
