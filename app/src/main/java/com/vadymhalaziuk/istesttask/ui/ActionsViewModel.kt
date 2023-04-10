@@ -14,6 +14,7 @@ import com.vadymhalaziuk.istesttask.ui.model.ActionButtonContentState
 import com.vadymhalaziuk.istesttask.ui.model.ActionEffect
 import com.vadymhalaziuk.istesttask.ui.model.ActionEvent
 import com.vadymhalaziuk.istesttask.ui.model.ScreenState
+import com.vadymhalaziuk.istesttask.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
@@ -85,49 +86,53 @@ class ActionsViewModel @Inject constructor(
 
             _state.update { it.loading() }
 
-            val actionTypeResult = getActionUseCase()
-
-            _effect.emit(ActionEffect.Notification(R.string.push_title))
-
-            actionTypeResult.ifSuccess { actionType ->
-
-                if (actionType !in TrackActionUseCase.actionsWithAssurance) {
-                    viewModelScope.launch(ioDispatcher) {
-                        trackAction(actionType)
-                    }
-                }
-
-                _effect.emit(
-                    when (actionType) {
-                        ActionDomainType.ANIMATION -> ActionEffect.ShowAnimation()
-                        ActionDomainType.TOAST -> ActionEffect.Toast(R.string.success_action_title)
-                        ActionDomainType.NOTIFICATION -> ActionEffect.Notification(R.string.success_action_title)
-                        else -> {
-                            _state.update { it.loading(false) }
-                            return@launch
-                        }
-                    }
-                )
-            }.ifError { errorType ->
-                when (errorType) {
-                    is ActionDomainError.NoAvailable -> {
-                        _state.update { it.content { ActionButtonContentState.DISABLED } }
-
-                        emitDialog(
-                            R.string.unable_to_make_click_title,
-                            R.string.unable_to_make_click_subtitle
-                        )
-                    }
-                    else -> {
-                        emitDialog(
-                            title = R.string.unknown_error_title,
-                            subtitle = R.string.unknown_error_subtitle
-                        )
-                    }
-                }
-            }
+            handleExecutionResult(getActionUseCase())
 
             _state.update { it.loading(false) }
+        }
+    }
+
+    private suspend fun handleExecutionResult(actionResult: Result<ActionDomainType, ActionDomainError>) {
+        actionResult.ifSuccess { actionType ->
+
+            trackActionPreviousIfNeeded(actionType)
+
+            _effect.emit(
+                when (actionType) {
+                    ActionDomainType.ANIMATION -> ActionEffect.ShowAnimation()
+                    ActionDomainType.TOAST -> ActionEffect.Toast(R.string.success_action_title)
+                    ActionDomainType.NOTIFICATION -> ActionEffect.Notification(R.string.success_action_title)
+                    else -> {
+                        _state.update { it.loading(false) }
+                        return
+                    }
+                }
+            )
+        }.ifError { errorType ->
+            when (errorType) {
+                is ActionDomainError.NoAvailable -> {
+                    _state.update { it.content { ActionButtonContentState.DISABLED } }
+
+                    emitDialog(
+                        R.string.unable_to_make_click_title,
+                        R.string.unable_to_make_click_subtitle
+                    )
+                }
+                else -> {
+                    emitDialog(
+                        title = R.string.unknown_error_title,
+                        subtitle = R.string.unknown_error_subtitle
+                    )
+                }
+            }
+        }
+    }
+
+    private suspend fun trackActionPreviousIfNeeded(actionDomainType: ActionDomainType) {
+        if (actionDomainType !in TrackActionUseCase.actionsWithAssurance) {
+            viewModelScope.launch(ioDispatcher) {
+                trackAction(actionDomainType)
+            }
         }
     }
 
